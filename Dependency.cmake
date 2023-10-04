@@ -1,0 +1,80 @@
+# ExternalProject 관련 명령어 셋 추가
+# CMake에서 추가적인 기능을 위해 사용 (ExternalProject_Add를 사용하기 위함)
+include(ExternalProject)
+
+# Dependency 관련 변수 설정 (directories 설정)
+set(DEP_INSTALL_DIR ${PROJECT_BINARY_DIR}/install)  # PROJECT_BINARY_DIR : build/
+set(DEP_INCLUDE_DIR ${DEP_INSTALL_DIR}/include)     # build/install/include
+set(DEP_LIB_DIR ${DEP_INSTALL_DIR}/lib)             
+
+# spdlog: fast logger library (refer to cout)
+# 적혀있는 주소에서 다운받아서 cmake를 실행
+ExternalProject_Add(
+    dep_spdlog              # build 후 나오는 이름 (변수 같은 것)
+    GIT_REPOSITORY "https://github.com/gabime/spdlog.git"
+    GIT_TAG "v1.x"          # version (해당 repo에서 사용할 branch 또는 tag를 가져옴)
+    GIT_SHALLOW 1           # GIT_SHALLOW를 활성화 한다. (SHALLOW는 가장 최신의 것만을 다운받겠다.)
+
+    # update_step, patch_step을 생략("")하겠다.
+    UPDATE_COMMAND ""       # 라이브러리가 최신화되면 업데이트 하겠다.
+    PATCH_COMMAND ""        # 내가 이 라이브러리를 고쳐 쓸 경우
+
+    # CMAKE에 인자를 넣겠다. (변수명 : CMAKE_INSTALL_PREFIX) -> "라이브러리 빌드 다 했을 때, 어디에 넣을래?"
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
+
+    TEST_COMMAND ""         # test step 생략
+)
+
+# Dependency 리스트에 dep_spdlog추가
+set(DEP_LIST ${DEP_LIST} dep_spdlog)
+
+# $<$<CONFIG:Debug>:d> 는 debug모드로 컴파일 하는 경우에는 d, 아니면 아무것도 붙이지 말라 (mac에선 지움)
+if(MSVC)
+    set(DEP_LIBS ${DEP_LIBS} spdlog$<$<CONFIG:Debug>:d>)
+else()
+    set(DEP_LIBS ${DEP_LIBS} spdlog)
+endif()
+
+# glfw
+ExternalProject_Add(
+    dep_glfw
+    GIT_REPOSITORY "https://github.com/glfw/glfw.git"
+    GIT_TAG "3.3.2"
+    GIT_SHALLOW 1
+    UPDATE_COMMAND "" PATCH_COMMAND "" TEST_COMMAND ""
+    CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
+        -DGLFW_BUILD_EXAMPLES=OFF
+        -DGLFW_BUILD_TESTS=OFF
+        -DGLFW_BUILD_DOCS=OFF
+    )
+
+# Dependency 리스트에 dep_glfw추가
+set(DEP_LIST ${DEP_LIST} dep_glfw)
+
+if(MSVC)
+    set(DEP_LIBS ${DEP_LIBS} glfw3$<$<CONFIG:Debug>:d>)
+else()
+    set(DEP_LIBS ${DEP_LIBS} glfw3)
+endif()
+
+# glad
+ExternalProject_Add(
+    dep_glad
+    GIT_REPOSITORY "https://github.com/Dav1dde/glad.git"
+    GIT_TAG "v0.1.34"
+    GIT_SHALLOW 1
+    UPDATE_COMMAND "" PATCH_COMMAND "" TEST_COMMAND ""
+    CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
+        -DGLAD_INSTALL=ON
+    )
+
+# Dependency 리스트에 dep_glfw추가
+set(DEP_LIST ${DEP_LIST} dep_glad)
+
+if(MSVC)
+    set(DEP_LIBS ${DEP_LIBS} glad$<$<CONFIG:Debug>:d>)
+else()
+    set(DEP_LIBS ${DEP_LIBS} glad)
+endif()
