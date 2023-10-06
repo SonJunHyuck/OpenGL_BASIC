@@ -12,7 +12,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 # 변수명 : PROJECT_NAME, 값 : cmake_project_example
-set(PROJECT_NAME first_opengl_project)
+set(PROJECT_NAME opengl_project)
 
 # C++ 17버전 쓸것이다.
 set(CMAKE_CXX_STANDARD 17)
@@ -23,7 +23,7 @@ if(APPLE)
 endif()
 
 # glfw 변수 정의
-set(WINDOW_NAME "First OpenGL Project")
+set(WINDOW_NAME "OpenGL Project")
 set(WINDOW_WIDTH 640)
 set(WINDOW_HEIGHT 480)
 
@@ -31,7 +31,11 @@ set(WINDOW_HEIGHT 480)
 project(${PROJECT_NAME})
 
 # cmake_project_example이라는 실행파일 만들거고, 뒤에 붙어있는 모든 소스파일 모아서
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(${PROJECT_NAME} 
+    src/main.cpp
+    src/common.cpp
+    src/shader.cpp
+)
 
 
 # --------------------------------------------------------
