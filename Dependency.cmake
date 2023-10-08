@@ -20,7 +20,9 @@ ExternalProject_Add(
     PATCH_COMMAND ""        # 내가 이 라이브러리를 고쳐 쓸 경우
 
     # CMAKE에 인자를 넣겠다. (변수명 : CMAKE_INSTALL_PREFIX) -> "라이브러리 빌드 다 했을 때, 어디에 넣을래?"
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
+    CMAKE_ARGS 
+        -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
+        -DSPDLOG_BUILD_EXAMPLE=OFF
 
     TEST_COMMAND ""         # test step 생략
 )
@@ -29,11 +31,12 @@ ExternalProject_Add(
 set(DEP_LIST ${DEP_LIST} dep_spdlog)
 
 # $<$<CONFIG:Debug>:d> 는 debug모드로 컴파일 하는 경우에는 d, 아니면 아무것도 붙이지 말라 (mac에선 지움)
-if(MSVC)
-    set(DEP_LIBS ${DEP_LIBS} spdlog$<$<CONFIG:Debug>:d>)
-else()
+if(APPLE OR MINGW)
     set(DEP_LIBS ${DEP_LIBS} spdlog)
+else()
+    set(DEP_LIBS ${DEP_LIBS} spdlog$<$<CONFIG:Debug>:d>)
 endif()
+
 
 # glfw
 ExternalProject_Add(
@@ -52,10 +55,10 @@ ExternalProject_Add(
 # Dependency 리스트에 dep_glfw추가
 set(DEP_LIST ${DEP_LIST} dep_glfw)
 
-if(MSVC)
-    set(DEP_LIBS ${DEP_LIBS} glfw3$<$<CONFIG:Debug>:d>)
-else()
+if(APPLE OR MINGW)
     set(DEP_LIBS ${DEP_LIBS} glfw3)
+else()
+    set(DEP_LIBS ${DEP_LIBS} glfw3$<$<CONFIG:Debug>:d>)
 endif()
 
 # glad
@@ -73,8 +76,8 @@ ExternalProject_Add(
 # Dependency 리스트에 dep_glfw추가
 set(DEP_LIST ${DEP_LIST} dep_glad)
 
-if(MSVC)
-    set(DEP_LIBS ${DEP_LIBS} glad$<$<CONFIG:Debug>:d>)
-else()
+if(APPLE OR MINGW)
     set(DEP_LIBS ${DEP_LIBS} glad)
+else()
+    set(DEP_LIBS ${DEP_LIBS} glad$<$<CONFIG:Debug>:d>)
 endif()
