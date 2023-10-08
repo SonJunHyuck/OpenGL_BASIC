@@ -1,9 +1,11 @@
-#include <spdlog/spdlog.h>
+#include "common.h"
+#include "shader.h"
 
-#include <glad/glad.h>              // glfw 이전에 include!
+#include <spdlog/spdlog.h>
+#include <glad/glad.h> // glfw 이전에 include!
 #include <GLFW/glfw3.h>
 
-void OnFramebufferSizeChange(GLFWwindow* window, int width, int height)
+void OnFramebufferSizeChange(GLFWwindow *window, int width, int height)
 {
     SPDLOG_INFO("framebuffer size changed: ({} x {})", width, height);
 
@@ -11,18 +13,19 @@ void OnFramebufferSizeChange(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-void OnKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods) 
+void OnKeyEvent(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
     SPDLOG_INFO("key: {}, scancode: {}, action: {}, mods: {}{}{}",
-        key, scancode,
-        action == GLFW_PRESS ? "Pressed" :
-        action == GLFW_RELEASE ? "Released" :
-        action == GLFW_REPEAT ? "Repeat" : "Unknown",
-        mods & GLFW_MOD_CONTROL ? "C" : "-",
-        mods & GLFW_MOD_SHIFT ? "S" : "-",
-        mods & GLFW_MOD_ALT ? "A" : "-");
+                key, scancode,
+                action == GLFW_PRESS ? "Pressed" : action == GLFW_RELEASE ? "Released"
+                                               : action == GLFW_REPEAT    ? "Repeat"
+                                                                          : "Unknown",
+                mods & GLFW_MOD_CONTROL ? "C" : "-",
+                mods & GLFW_MOD_SHIFT ? "S" : "-",
+                mods & GLFW_MOD_ALT ? "A" : "-");
 
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    {
         glfwSetWindowShouldClose(window, true);
     }
 }
@@ -38,14 +41,14 @@ void Render()
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-int main ()
+int main()
 {
     SPDLOG_INFO("Start program!");
 
     SPDLOG_INFO("Initialize glfw");
-    if(!glfwInit())
+    if (!glfwInit())
     {
-        const char* description = nullptr;
+        const char *description = nullptr;
         glfwGetError(&description);
         SPDLOG_ERROR("failed to initialize glfw: {}", description);
 
@@ -58,10 +61,10 @@ int main ()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     SPDLOG_INFO("Create window!");
-    //GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME, nullptr, nullptr);
+    // GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME, nullptr, nullptr);
     auto window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME, nullptr, nullptr);
 
-    if(!window)
+    if (!window)
     {
         SPDLOG_ERROR("failed to create glfw window");
         glfwTerminate();
@@ -72,14 +75,21 @@ int main ()
     glfwMakeContextCurrent(window);
 
     // glad를 이용한 openGL 함수 로딩 (process address를 얻어옴)
-    if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         SPDLOG_ERROR("failed to initialize glad");
         glfwTerminate();
         return -1;
     }
-    auto glVersion = (const char*)glGetString(GL_VERSION);
+    auto glVersion = (const char *)glGetString(GL_VERSION);
     SPDLOG_INFO("OpenGL context version: {}", glVersion);
+
+    // ========== 여기서부터 GL Functions 사용 가능 ==========
+
+    auto vertexShader = Shader::CreateFromFile("../shader/simple.vs", GL_VERTEX_SHADER);
+    auto fragmentShader = Shader::CreateFromFile("../shader/simple.fs", GL_FRAGMENT_SHADER);
+    SPDLOG_INFO("vertex shader id: {}", vertexShader->Get());
+    SPDLOG_INFO("fragment shader id: {}", fragmentShader->Get());
 
     // forced set viewport
     OnFramebufferSizeChange(window, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -89,13 +99,13 @@ int main ()
     glfwSetKeyCallback(window, OnKeyEvent);
 
     SPDLOG_INFO("Start main loop");
-    while(!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose(window))
     {
         Render();
 
         // mouse, keyboard, window size event... 등을 수집
         glfwPollEvents();
-        
+
         glfwSwapBuffers(window);
     }
 

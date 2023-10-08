@@ -31,7 +31,11 @@ set(WINDOW_HEIGHT 480)
 project(${PROJECT_NAME})
 
 # cmake_project_example이라는 실행파일 만들거고, 뒤에 붙어있는 모든 소스파일 모아서
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(${PROJECT_NAME} 
+    src/main.cpp
+    src/common.cpp
+    src/shader.cpp
+)
 
 
 # --------------------------------------------------------
