@@ -1,5 +1,6 @@
 #include "common.h"
 #include "shader.h"
+#include "program.h"
 
 #include <spdlog/spdlog.h>
 #include <glad/glad.h> // glfw 이전에 include!
@@ -18,8 +19,8 @@ void OnKeyEvent(GLFWwindow *window, int key, int scancode, int action, int mods)
     SPDLOG_INFO("key: {}, scancode: {}, action: {}, mods: {}{}{}",
                 key, scancode,
                 action == GLFW_PRESS ? "Pressed" : action == GLFW_RELEASE ? "Released"
-                                               : action == GLFW_REPEAT    ? "Repeat"
-                                                                          : "Unknown",
+                                                 : action == GLFW_REPEAT ? "Repeat"
+                                                 : "Unknown",
                 mods & GLFW_MOD_CONTROL ? "C" : "-",
                 mods & GLFW_MOD_SHIFT ? "S" : "-",
                 mods & GLFW_MOD_ALT ? "A" : "-");
@@ -85,10 +86,14 @@ int main()
     SPDLOG_INFO("OpenGL context version: {}", glVersion);
 
     // ========== Glad Load 끝 -> 여기서부터 GL Functions 사용 가능 ==========
-    auto vertexShader = Shader::CreateFromFile("../shader/simple.vs", GL_VERTEX_SHADER);
-    auto fragmentShader = Shader::CreateFromFile("../shader/simple.fs", GL_FRAGMENT_SHADER);
-    SPDLOG_INFO("vertex shader id: {}", vertexShader->Get());
-    SPDLOG_INFO("fragment shader id: {}", fragmentShader->Get());
+    std::shared_ptr<Shader> vertShader = Shader::CreateFromFile("../shader/simple.vs", GL_VERTEX_SHADER);
+    std::shared_ptr<Shader> fragShader = Shader::CreateFromFile("../shader/simple.fs", GL_FRAGMENT_SHADER);
+    SPDLOG_INFO("vertex shader id: {}", vertShader->Get());
+    SPDLOG_INFO("fragment shader id: {}", fragShader->Get());
+
+    // ========== Link =========
+    auto program = Program::Create({fragShader, vertShader});
+    SPDLOG_INFO("program id: {}", program->Get());
 
     // forced set viewport
     OnFramebufferSizeChange(window, WINDOW_WIDTH, WINDOW_HEIGHT);
