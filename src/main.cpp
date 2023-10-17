@@ -84,8 +84,7 @@ int main()
     auto glVersion = (const char *)glGetString(GL_VERSION);
     SPDLOG_INFO("OpenGL context version: {}", glVersion);
 
-    // ========== 여기서부터 GL Functions 사용 가능 ==========
-
+    // ========== Glad Load 끝 -> 여기서부터 GL Functions 사용 가능 ==========
     auto vertexShader = Shader::CreateFromFile("../shader/simple.vs", GL_VERTEX_SHADER);
     auto fragmentShader = Shader::CreateFromFile("../shader/simple.fs", GL_FRAGMENT_SHADER);
     SPDLOG_INFO("vertex shader id: {}", vertexShader->Get());

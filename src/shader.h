@@ -24,7 +24,7 @@ private:
     // 생성자, 초기화 함수 모두 private -> 오직 CrateFromFile 만을 이용해서 인스턴스를 만들어라.
     Shader() {}  // new 불가능
     bool LoadFile(const std::string &filename, GLenum shaderType);
-    uint32_t m_shader{0};
+    uint32_t m_shader{ 0 };
 };
 
 #endif // __SHADER_H__

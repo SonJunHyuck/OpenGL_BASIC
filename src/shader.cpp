@@ -1,11 +1,12 @@
 #include "shader.h"
 
-Shader::~Shader() 
+Shader::~Shader()
 {
-  if (m_shader) 
-  {
-    glDeleteShader(m_shader);  // delete shader object
-  }
+    // Shader가 있다. -> 제거 돼야함
+    if (m_shader)
+    {
+        glDeleteShader(m_shader); // delete shader object
+    }
 }
 
 ShaderUPtr Shader::CreateFromFile(const std::string &filename, GLenum shaderType)
@@ -29,22 +30,23 @@ bool Shader::LoadFile(const std::string &filename, GLenum shaderType)
         return false;
 
     // std::string code = result.value(); 로 받으면, 용량이 너무 커짐
-    std::string& code = result.value();
-    const char* codePtr = code.c_str();
+    std::string &code = result.value();
+    const char *codePtr = code.c_str();
     int32_t codeLength = (int32_t)code.length();
 
-    // create and compile shader
-    m_shader = glCreateShader(shaderType);  // (SHADER) create shader object
-    glShaderSource(m_shader, 1, (const GLchar *const *)&codePtr, &codeLength);  // (SHADER) object <- code 
-    glCompileShader(m_shader);  // (SHADER) compile
+    // (SAHDER) create and compile shader
+    m_shader = glCreateShader(shaderType);                                     // (SHADER) create shader object
+    glShaderSource(m_shader, 1, (const GLchar *const *)&codePtr, &codeLength); // (SHADER) object <- code
+    glCompileShader(m_shader);                                                 // (SHADER) compile
 
     // check compile error
     int success = 0;
-    glGetShaderiv(m_shader, GL_COMPILE_STATUS, &success);  // (SHADER) get shader info
+    glGetShaderiv(m_shader, GL_COMPILE_STATUS, &success); // (SHADER) get shader info
     if (!success)
     {
-        char infoLog[1024];
-        glGetShaderInfoLog(m_shader, 1024, nullptr, infoLog);  // get error info
+        const int info_max_length = 1024;
+        char infoLog[info_max_length];
+        glGetShaderInfoLog(m_shader, info_max_length, nullptr, infoLog); // get error info
         SPDLOG_ERROR("failed to compile shader: \"{}\"", filename);
         SPDLOG_ERROR("reason: {}", infoLog);
         return false;
