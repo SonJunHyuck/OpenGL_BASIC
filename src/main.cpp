@@ -1,6 +1,4 @@
-#include "common.h"
-#include "shader.h"
-#include "program.h"
+#include "context.h"  // common, shader, program 모두 포함
 
 #include <spdlog/spdlog.h>
 #include <glad/glad.h> // glfw 이전에 include!
@@ -33,10 +31,6 @@ void OnKeyEvent(GLFWwindow *window, int key, int scancode, int action, int mods)
 
 void Render()
 {
-    // "state setting function" (save to OpenGL context)
-    // 프레임버퍼 클리어할 컬러 설정
-    glClearColor(0.0f, 0.1f, 0.2f, 0.9f);
-
     // "state using function" (using OpenGL context)
     // 실제 클리어 수행 (GL_COLOR_BIT : 컬러 버퍼)
     glClear(GL_COLOR_BUFFER_BIT);
@@ -86,14 +80,13 @@ int main()
     SPDLOG_INFO("OpenGL context version: {}", glVersion);
 
     // ========== Glad Load 끝 -> 여기서부터 GL Functions 사용 가능 ==========
-    std::shared_ptr<Shader> vertShader = Shader::CreateFromFile("../shader/simple.vs", GL_VERTEX_SHADER);
-    std::shared_ptr<Shader> fragShader = Shader::CreateFromFile("../shader/simple.fs", GL_FRAGMENT_SHADER);
-    SPDLOG_INFO("vertex shader id: {}", vertShader->Get());
-    SPDLOG_INFO("fragment shader id: {}", fragShader->Get());
-
-    // ========== Link =========
-    auto program = Program::Create({fragShader, vertShader});
-    SPDLOG_INFO("program id: {}", program->Get());
+    auto context = Context::Create();
+    if (!context)
+    {
+        SPDLOG_ERROR("failed to create context");
+        glfwTerminate();
+        return -1;
+    }
 
     // forced set viewport
     OnFramebufferSizeChange(window, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -105,13 +98,16 @@ int main()
     SPDLOG_INFO("Start main loop");
     while (!glfwWindowShouldClose(window))
     {
-        Render();
+        context->Render();
+
+        glfwSwapBuffers(window);
 
         // mouse, keyboard, window size event... 등을 수집
         glfwPollEvents();
-
-        glfwSwapBuffers(window);
     }
+
+    // gl 끝나기 전에 메모리 정리 해야함
+    context.reset();
 
     glfwTerminate();
 
