@@ -9,7 +9,7 @@ void OnFramebufferSizeChange(GLFWwindow *window, int width, int height)
     SPDLOG_INFO("framebuffer size changed: ({} x {})", width, height);
 
     // rendering 화면 지정
-    glViewport(0, 0, width, height);
+    glViewport(width * 0.5f, height * 0.5f, width, height);
 }
 
 void OnKeyEvent(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -27,13 +27,6 @@ void OnKeyEvent(GLFWwindow *window, int key, int scancode, int action, int mods)
     {
         glfwSetWindowShouldClose(window, true);
     }
-}
-
-void Render()
-{
-    // "state using function" (using OpenGL context)
-    // 실제 클리어 수행 (GL_COLOR_BIT : 컬러 버퍼)
-    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 int main()
