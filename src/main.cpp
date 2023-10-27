@@ -9,16 +9,19 @@ void OnFramebufferSizeChange(GLFWwindow *window, int width, int height)
     SPDLOG_INFO("framebuffer size changed: ({} x {})", width, height);
 
     // rendering 화면 지정
-    glViewport(width * 0.5f, height * 0.5f, width, height);
-}
+    glViewport(0, 0, width, height);
+    int w, h;
+    glfwGetWindowSize(window, &w, &h);
+    SPDLOG_INFO("({} x {})", w, h);
+}   
 
 void OnKeyEvent(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
     SPDLOG_INFO("key: {}, scancode: {}, action: {}, mods: {}{}{}",
                 key, scancode,
-                action == GLFW_PRESS ? "Pressed" : action == GLFW_RELEASE ? "Released"
-                                                 : action == GLFW_REPEAT ? "Repeat"
-                                                 : "Unknown",
+                action == GLFW_PRESS ? "Pressed" : 
+                action == GLFW_RELEASE ? "Released" :
+                action == GLFW_REPEAT ? "Repeat" : "Unknown",
                 mods & GLFW_MOD_CONTROL ? "C" : "-",
                 mods & GLFW_MOD_SHIFT ? "S" : "-",
                 mods & GLFW_MOD_ALT ? "A" : "-");
@@ -81,9 +84,9 @@ int main()
         return -1;
     }
 
-    // forced set viewport
-    OnFramebufferSizeChange(window, WINDOW_WIDTH, WINDOW_HEIGHT);
-
+    // forced set viewport (frambuffer이 계속 window size * 2로 잡혀서, 강제로 버퍼 사이즈 설정)
+    OnFramebufferSizeChange(window, WINDOW_WIDTH * 2, WINDOW_HEIGHT * 2);
+    
     // setting events
     glfwSetFramebufferSizeCallback(window, OnFramebufferSizeChange);
     glfwSetKeyCallback(window, OnKeyEvent);
@@ -91,7 +94,7 @@ int main()
     SPDLOG_INFO("Start main loop");
     while (!glfwWindowShouldClose(window))
     {
-        context->Render();
+            context->Render();
 
         glfwSwapBuffers(window);
 

@@ -24,8 +24,9 @@ void VertexLayout::SetAttrib( uint32_t attribIndex, int count, uint32_t type, bo
     size_t stride, uint64_t offset) const
 {
     glEnableVertexAttribArray(attribIndex);
-    glVertexAttribPointer(attribIndex, count,
-                          type, normalized, stride, (const void *)offset);
+
+    // stride : vertex 간의 간격 (vertex 안에는 pos, color 등 다양한 attr이 있음)
+    glVertexAttribPointer(attribIndex, count, type, normalized, stride, (const void *)offset);
 }
 
 void VertexLayout::Init()
