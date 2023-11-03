@@ -5,7 +5,7 @@ include(ExternalProject)
 # Dependency 관련 변수 설정 (directories 설정)
 set(DEP_INSTALL_DIR ${PROJECT_BINARY_DIR}/install)  # PROJECT_BINARY_DIR : build/
 set(DEP_INCLUDE_DIR ${DEP_INSTALL_DIR}/include)     # build/install/include
-set(DEP_LIB_DIR ${DEP_INSTALL_DIR}/lib)             
+set(DEP_LIB_DIR ${DEP_INSTALL_DIR}/lib)
 
 # spdlog: fast logger library (refer to cout)
 # 적혀있는 주소에서 다운받아서 cmake를 실행
@@ -81,3 +81,25 @@ if(APPLE OR MINGW)
 else()
     set(DEP_LIBS ${DEP_LIBS} glad$<$<CONFIG:Debug>:d>)
 endif()
+
+
+# stb
+ExternalProject_Add(
+    dep_stb
+    GIT_REPOSITORY "https://github.com/nothings/stb"
+    GIT_TAG "master"
+    GIT_SHALLOW 1
+    UPDATE_COMMAND ""
+    PATCH_COMMAND ""
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    TEST_COMMAND ""
+    # install -> only stb_image.h (-E copy : windows, linux, macOS anything)
+    INSTALL_COMMAND ${CMAKE_COMMAND} -E copy
+        ${PROJECT_BINARY_DIR}/dep_stb-prefix/src/dep_stb/stb_image.h
+        ${DEP_INSTALL_DIR}/include/stb/stb_image.h
+    )
+
+set(DEP_LIST ${DEP_LIST} dep_stb)
+
+# because don't need build -> DEP_LIBS X
