@@ -39,6 +39,7 @@ add_executable(${PROJECT_NAME}
     src/context.cpp src/context.h
     src/buffer.cpp src/buffer.h
     src/vertex_layout.cpp src/vertex_layout.h
+    src/image.cpp src/image.h
 )
 
 # --------------------------------------------------------
@@ -71,3 +72,4 @@ add_dependencies(${PROJECT_NAME} ${DEP_LIST})
 
 
 file( COPY ${CMAKE_CURRENT_SOURCE_DIR}/shader DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )
+file( COPY ${CMAKE_CURRENT_SOURCE_DIR}/images DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )

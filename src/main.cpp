@@ -10,9 +10,9 @@ void OnFramebufferSizeChange(GLFWwindow *window, int width, int height)
 
     // rendering 화면 지정
     glViewport(0, 0, width, height);
-    int w, h;
-    glfwGetWindowSize(window, &w, &h);
-    SPDLOG_INFO("({} x {})", w, h);
+    // int w, h;
+    // glfwGetWindowSize(window, &w, &h);
+    // SPDLOG_INFO("({} x {})", w, h);
 }   
 
 void OnKeyEvent(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -94,7 +94,7 @@ int main()
     SPDLOG_INFO("Start main loop");
     while (!glfwWindowShouldClose(window))
     {
-            context->Render();
+        context->Render();
 
         glfwSwapBuffers(window);
 
