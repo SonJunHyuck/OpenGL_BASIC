@@ -64,18 +64,4 @@ void Context::Render()
 
     // primitive, count, index_type, pointer/offset
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-    // primitive, offset, count
-    // // glDrawArrays(GL_TRIANGLES, 0, 6);
-
-    // glClear(GL_COLOR_BUFFER_BIT);
-
-    // static float time = 0.0f;
-    // float t = sinf(time) * 0.5f + 0.5f;
-    // auto loc = glGetUniformLocation(m_program->Get(), "color");
-    // m_program->Use();
-    // glUniform4f(loc, t * t, 2.0f * t * (1.0f - t), (1.0f - t) * (1.0f - t), 1.0f);
-    // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-    // time += 0.016f;
 }
