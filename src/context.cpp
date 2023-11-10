@@ -68,12 +68,7 @@ bool Context::Init()
     SPDLOG_INFO("image: {}x{}, {} channels", 
                     image->GetWidth(), image->GetHeight(), image->GetChannelCount());
 
-    glGenTextures(1, &m_texture);
-    glBindTexture(GL_TEXTURE_2D, m_texture);  // GPU로 옮길 준비
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // S -> X
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);  // T -> Y
+    m_texture = Texture::CreateFromImage(image.get());
 
     // glTexImage2D(target, mipmap_level, internalFormat, width, height, border, format, type, data)
     // CPU -> GPU (CPU 데이터 해석 + GPU 데이터 해석)
