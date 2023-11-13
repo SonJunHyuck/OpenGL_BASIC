@@ -62,6 +62,7 @@ bool Context::Init()
 
     // ======== Texture ========
     auto image = Image::Load("./images/container.jpg");
+
     if (!image)
         return false;
 
@@ -70,11 +71,24 @@ bool Context::Init()
 
     m_texture = Texture::CreateFromImage(image.get());
 
-    // glTexImage2D(target, mipmap_level, internalFormat, width, height, border, format, type, data)
-    // CPU -> GPU (CPU 데이터 해석 + GPU 데이터 해석)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
-                 image->GetWidth(), image->GetHeight(), 0,
-                 GL_RGB, GL_UNSIGNED_BYTE, image->GetData());
+    auto image2 = Image::Load("./images/awesomeface.png");
+
+    if (!image2)
+        return false;
+
+    SPDLOG_INFO("image: {}x{}, {} channels", 
+                    image2->GetWidth(), image2->GetHeight(), image2->GetChannelCount());
+
+    m_texture2 = Texture::CreateFromImage(image2.get());
+
+    glActiveTexture(GL_TEXTURE0);  // 0번 Slot
+    glBindTexture(GL_TEXTURE_2D, m_texture->Get());
+    glActiveTexture(GL_TEXTURE1);  // 1번 Slot
+    glBindTexture(GL_TEXTURE_2D, m_texture2->Get());
+
+    m_program->Use();
+    glUniform1i(glGetUniformLocation(m_program->Get(), "tex"), 0);  // 0번 슬롯에 텍스쳐 바인딩
+    glUniform1i(glGetUniformLocation(m_program->Get(), "tex2"), 1);  // 1번 슬롯에 ...
 
     return true;
 }
