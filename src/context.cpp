@@ -90,6 +90,15 @@ bool Context::Init()
     glUniform1i(glGetUniformLocation(m_program->Get(), "tex"), 0);  // 0번 슬롯에 텍스쳐 바인딩
     glUniform1i(glGetUniformLocation(m_program->Get(), "tex2"), 1);  // 1번 슬롯에 ...
 
+    // 0.5배 축소후 z축으로 90도 회전하는 행렬
+    auto transform = glm::rotate(
+    glm::scale(glm::mat4(1.0f), glm::vec3(2.0f)),
+    glm::radians(60.0f), glm::vec3(0.0f, 0.0f, 1.0f) );
+    // shader에 uniform Location 번호 반환
+    auto transformLoc = glGetUniformLocation(m_program->Get(), "transform");
+    // Location, Mat 몇개?, is_transpose, mat4의 첫 번째 주소값
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+
     return true;
 }
 
