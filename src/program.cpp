@@ -48,3 +48,17 @@ void Program::Use() const
 {
     glUseProgram(m_program);
 }
+
+void Program::SetUniform(const std::string& name, int value) const 
+{
+  auto loc = glGetUniformLocation(m_program, name.c_str());
+  glUniform1i(loc, value);
+}
+
+void Program::SetUniform(const std::string& name, const glm::mat4& value) const 
+{
+  auto loc = glGetUniformLocation(m_program, name.c_str());
+  
+  // Location, Mat 몇개?, is_transpose, mat4의 첫 번째 주소값
+  glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
+}
