@@ -7,12 +7,11 @@
 void OnFramebufferSizeChange(GLFWwindow *window, int width, int height)
 {
     SPDLOG_INFO("framebuffer size changed: ({} x {})", width, height);
+    
+    // 아예 형변환 시켜버릴 것
+    auto context = reinterpret_cast<Context*>(glfwGetWindowUserPointer(window));
 
-    // rendering 화면 지정
-    glViewport(0, 0, width, height);
-    // int w, h;
-    // glfwGetWindowSize(window, &w, &h);
-    // SPDLOG_INFO("({} x {})", w, h);
+    context->Reshape(width, height);
 }   
 
 void OnKeyEvent(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -30,6 +29,20 @@ void OnKeyEvent(GLFWwindow *window, int key, int scancode, int action, int mods)
     {
         glfwSetWindowShouldClose(window, true);
     }
+}
+
+void OnCursorPos(GLFWwindow *window, double x, double y)
+{
+    auto context = (Context *)glfwGetWindowUserPointer(window);
+    context->MouseMove(x, y);
+}
+
+void OnMouseButton(GLFWwindow *window, int button, int action, int modifier)
+{
+    auto context = (Context *)glfwGetWindowUserPointer(window);
+    double x, y;
+    glfwGetCursorPos(window, &x, &y);
+    context->MouseButton(button, action, x, y);
 }
 
 int main()
@@ -83,17 +96,20 @@ int main()
         glfwTerminate();
         return -1;
     }
+    glfwSetWindowUserPointer(window, context.get());
 
+    // setting events
     // forced set viewport (frambuffer이 계속 window size * 2로 잡혀서, 강제로 버퍼 사이즈 설정)
     OnFramebufferSizeChange(window, WINDOW_WIDTH * 2, WINDOW_HEIGHT * 2);
-    
-    // setting events
     glfwSetFramebufferSizeCallback(window, OnFramebufferSizeChange);
     glfwSetKeyCallback(window, OnKeyEvent);
+    glfwSetCursorPosCallback(window, OnCursorPos);
+    glfwSetMouseButtonCallback(window, OnMouseButton);
 
     SPDLOG_INFO("Start main loop");
     while (!glfwWindowShouldClose(window))
     {
+        context->ProcessInput(window);
         context->Render();
 
         glfwSwapBuffers(window);
