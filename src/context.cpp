@@ -1,5 +1,6 @@
 #include "context.h"
 #include "image.h"
+#include <imgui.h>
 
 ContextUPtr Context::Create()
 {
@@ -199,7 +200,33 @@ bool Context::Init()
 }
 
 void Context::Render()
-{   
+{
+    // begin, end pair -> UI Window
+    if (ImGui::Begin("my first ImGui window"))
+    {
+        if(ImGui::ColorEdit4("Clear Color", glm::value_ptr(m_clearColor)))
+        {
+            glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
+        }
+        ImGui::Separator();
+
+        ImGui::DragFloat3("Camera Pos", glm::value_ptr(m_cameraPos), 0.01f);
+        ImGui::DragFloat("Camera Yaw", &m_cameraYaw, 0.5f);
+        ImGui::DragFloat("Camera Pitch", &m_cameraPitch, 0.5f, -89.0f, 89.0f);
+        ImGui::Separator();
+
+        if(ImGui::Button("Reset Camera"))
+        {
+            m_cameraYaw = 0.0f;
+            m_cameraPitch = 0.0f;
+            m_cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+        }
+        ImGui::Separator();
+
+        ImGui::Text("This is first text...");
+    }
+    ImGui::End();
+
     std::vector<glm::vec3> cubePositions = {
         glm::vec3( 0.0f, 0.0f, 0.0f),
         glm::vec3( 2.0f, 5.0f, -15.0f),
