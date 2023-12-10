@@ -106,7 +106,6 @@ int main()
 
     // ========== Glad Load 끝 -> 여기서부터 GL Functions 사용 가능 ==========
 
-
     // imgui
     auto imguiContext = ImGui::CreateContext();
     ImGui::SetCurrentContext(imguiContext);
@@ -118,7 +117,7 @@ int main()
     auto context = Context::Create();
     if (!context)
     {
-        SPDLOG_ERROR("failed to create context");
+        SPDLOG_ERROR("failed to create context");   
         glfwTerminate();
         return -1;
     }
@@ -133,7 +132,6 @@ int main()
     glfwSetCursorPosCallback(window, OnCursorPos);
     glfwSetMouseButtonCallback(window, OnMouseButton);
     glfwSetScrollCallback(window, OnScroll);
-
 
     SPDLOG_INFO("Start main loop");
     while (!glfwWindowShouldClose(window))
