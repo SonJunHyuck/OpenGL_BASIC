@@ -139,23 +139,28 @@ bool Context::Init()
     m_indexBuffer = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(uint32_t) * 36);
 
     // ========= Create =========
-    //ShaderPtr vertShader = Shader::CreateFromFile("../shader/simple.vs", GL_VERTEX_SHADER);
-    //ShaderPtr fragShader = Shader::CreateFromFile("../shader/simple.fs", GL_FRAGMENT_SHADER);
-    // ShaderPtr vertShader = Shader::CreateFromFile("./shader/per_vertex_color.vs", GL_VERTEX_SHADER);
-    // ShaderPtr fragShader = Shader::CreateFromFile("./shader/per_vertex_color.fs", GL_FRAGMENT_SHADER);
-    // ShaderPtr vertShader = Shader::CreateFromFile("./shader/texture.vs", GL_VERTEX_SHADER);
-    // ShaderPtr fragShader = Shader::CreateFromFile("./shader/texture.fs", GL_FRAGMENT_SHADER);
-    ShaderPtr vertShader = Shader::CreateFromFile("./shader/lighting.vs", GL_VERTEX_SHADER);
-    ShaderPtr fragShader = Shader::CreateFromFile("./shader/lighting.fs", GL_FRAGMENT_SHADER);
+    // //ShaderPtr vertShader = Shader::CreateFromFile("../shader/simple.vs", GL_VERTEX_SHADER);
+    // //ShaderPtr fragShader = Shader::CreateFromFile("../shader/simple.fs", GL_FRAGMENT_SHADER);
+    // // ShaderPtr vertShader = Shader::CreateFromFile("./shader/per_vertex_color.vs", GL_VERTEX_SHADER);
+    // // ShaderPtr fragShader = Shader::CreateFromFile("./shader/per_vertex_color.fs", GL_FRAGMENT_SHADER);
+    // // ShaderPtr vertShader = Shader::CreateFromFile("./shader/texture.vs", GL_VERTEX_SHADER);
+    // // ShaderPtr fragShader = Shader::CreateFromFile("./shader/texture.fs", GL_FRAGMENT_SHADER);
+    // ShaderPtr vertShader = Shader::CreateFromFile("./shader/lighting.vs", GL_VERTEX_SHADER);
+    // ShaderPtr fragShader = Shader::CreateFromFile("./shader/lighting.fs", GL_FRAGMENT_SHADER);
 
-    if (!vertShader || !fragShader)
-        return false;
+    // if (!vertShader || !fragShader)
+    //     return false;
     
-    SPDLOG_INFO("vertex shader id: {}", vertShader->Get());
-    SPDLOG_INFO("fragment shader id: {}", fragShader->Get());
+    // SPDLOG_INFO("vertex shader id: {}", vertShader->Get());
+    // SPDLOG_INFO("fragment shader id: {}", fragShader->Get());
 
-    // ========== Attach & Link =========
-    m_program = Program::Create({fragShader, vertShader});
+    // ========== Create & Attach & Link =========
+    m_simpleProgram = Program::Create("./shader/simple.vs", "./shader/simple.fs");
+    if (!m_simpleProgram)
+        return false;
+    SPDLOG_INFO("program id: {}", m_simpleProgram->Get());
+
+    m_program = Program::Create("./shader/lighting.vs", "./shader/lighting.fs");
     if (!m_program)
         return false;
     SPDLOG_INFO("program id: {}", m_program->Get());
@@ -189,6 +194,9 @@ bool Context::Init()
                     image2->GetWidth(), image2->GetHeight(), image2->GetChannelCount());
 
     m_texture2 = Texture::CreateFromImage(image2.get());
+
+    m_material.diffuse = Texture::CreateFromImage(Image::Load("./images/container2.png").get());
+    m_material.specular = Texture::CreateFromImage(Image::Load("./images/container2_specular.png").get());
 
     glActiveTexture(GL_TEXTURE0);  // 0번 Slot
     glBindTexture(GL_TEXTURE_2D, m_texture->Get());
@@ -237,9 +245,6 @@ void Context::Render()
 
         if (ImGui::CollapsingHeader("material", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            ImGui::ColorEdit3("m.ambient", glm::value_ptr(m_material.ambient));
-            ImGui::ColorEdit3("m.diffuse", glm::value_ptr(m_material.diffuse));
-            ImGui::ColorEdit3("m.specular", glm::value_ptr(m_material.specular));
             ImGui::DragFloat("m.shininess", &m_material.shininess, 1.0f, 1.0f, 256.0f);
         }
 
@@ -282,13 +287,9 @@ void Context::Render()
     auto lightModelTransform =
         glm::translate(glm::mat4(1.0), m_light.position) *
         glm::scale(glm::mat4(1.0), glm::vec3(0.1f));
-    m_program->Use();
-    m_program->SetUniform("lightPos", m_light.position);
-    m_program->SetUniform("light.ambient", m_light.diffuse);
-    m_program->SetUniform("material.ambient", m_material.diffuse);
-    m_program->SetUniform("ambientStrength", 1.0f);
-    m_program->SetUniform("transform", projection * view * lightModelTransform);
-    m_program->SetUniform("modelTransform", lightModelTransform);
+    m_simpleProgram->Use();
+    m_simpleProgram->SetUniform("color", glm::vec4(m_light.ambient + m_light.diffuse, 1.0f));
+    m_simpleProgram->SetUniform("transform", projection * view * lightModelTransform);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
     // Render Object Cubes
@@ -298,18 +299,21 @@ void Context::Render()
     m_program->SetUniform("light.ambient", m_light.ambient);
     m_program->SetUniform("light.diffuse", m_light.diffuse);
     m_program->SetUniform("light.specular", m_light.specular);
-    m_program->SetUniform("material.ambient", m_material.ambient);
-    m_program->SetUniform("material.diffuse", m_material.diffuse);
-    m_program->SetUniform("material.specular", m_material.specular);
+    m_program->SetUniform("material.diffuse", 0);
+    m_program->SetUniform("material.specular", 1);
     m_program->SetUniform("material.shininess", m_material.shininess);
+
+    glActiveTexture(GL_TEXTURE0);
+    m_material.diffuse->Bind();
+    glActiveTexture(GL_TEXTURE1);
+    m_material.specular->Bind();
 
     for (size_t i = 0; i < cubePositions.size(); i++)
     {
         auto& pos = cubePositions[i];
         auto model = glm::translate(glm::mat4(1.0f), pos);
         auto rotateAngle = glm::radians((float)glfwGetTime() * 120.0f + 20.0f * (float)i);
-        model = glm::rotate(model, m_animation ? rotateAngle : 0.0f,
-            glm::vec3(1.0f, 0.5f, 0.0f));
+        model = glm::rotate(model, m_animation ? rotateAngle : 0.0f, glm::vec3(1.0f, 0.5f, 0.0f));
         auto transform = projection * view * model;
         m_program->SetUniform("transform", transform);
         m_program->SetUniform("modelTransform", model);
