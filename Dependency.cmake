@@ -162,4 +162,5 @@ set(DEP_LIST ${DEP_LIST} dep_assimp)
 set(DEP_LIBS ${DEP_LIBS}
   assimp
   zlibstatic
+  IrrXML
 )
