@@ -54,12 +54,7 @@ ExternalProject_Add(
 
 # Dependency 리스트에 dep_glfw추가
 set(DEP_LIST ${DEP_LIST} dep_glfw)
-
-if(APPLE OR MINGW)
-    set(DEP_LIBS ${DEP_LIBS} glfw3)
-else()
-    set(DEP_LIBS ${DEP_LIBS} glfw3$<$<CONFIG:Debug>:d>)
-endif()
+set(DEP_LIBS ${DEP_LIBS} glfw3)
 
 # glad
 ExternalProject_Add(
@@ -75,12 +70,7 @@ ExternalProject_Add(
 
 # Dependency 리스트에 dep_glfw추가
 set(DEP_LIST ${DEP_LIST} dep_glad)
-
-if(APPLE OR MINGW)
-    set(DEP_LIBS ${DEP_LIBS} glad)
-else()
-    set(DEP_LIBS ${DEP_LIBS} glad$<$<CONFIG:Debug>:d>)
-endif()
+set(DEP_LIBS ${DEP_LIBS} glad)
 
 
 # stb
@@ -154,13 +144,17 @@ ExternalProject_Add(
   TEST_COMMAND ""
   )
 set(DEP_LIST ${DEP_LIST} dep_assimp)
-# set(DEP_LIBS ${DEP_LIBS}
-#   assimp-vc142-mt$<$<CONFIG:Debug>:d>
-#   zlibstatic$<$<CONFIG:Debug>:d>
-#   IrrXML$<$<CONFIG:Debug>:d>
-# )
+
+if(APPLE)
 set(DEP_LIBS ${DEP_LIBS}
   assimp
   zlibstatic
   IrrXML
 )
+else()
+set(DEP_LIBS ${DEP_LIBS}
+  assimp-vc143-mt$<$<CONFIG:Debug>:d>
+  zlibstatic$<$<CONFIG:Debug>:d>
+  IrrXML$<$<CONFIG:Debug>:d>
+)
+endif()
