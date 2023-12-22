@@ -90,8 +90,8 @@ void Material::SetToProgram(const Program *program) const
         glActiveTexture(GL_TEXTURE0 + textureCount);
         program->SetUniform("material.specular", textureCount);
         specular->Bind();
-        textureCount++;
+        //textureCount++;
     }
-    glActiveTexture(GL_TEXTURE0);
+    // glActiveTexture(GL_TEXTURE0 + textureCount);
     program->SetUniform("material.shininess", shininess);
 }
