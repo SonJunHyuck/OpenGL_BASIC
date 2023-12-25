@@ -88,6 +88,7 @@ void Context::MouseButton(int button, int action, double x, double y)
 bool Context::Init()
 {
     m_box = Mesh::CreateBox();
+    m_plane = Mesh::CreatePlane();
 
     // ========== Create & Attach & Link ========= (create shader func has covered program clas)
     m_simpleProgram = Program::Create("./shader/simple.vs", "./shader/simple.fs");
@@ -100,6 +101,11 @@ bool Context::Init()
         return false;
     SPDLOG_INFO("program id: {}", m_program->Get());
 
+    m_textureProgram = Program::Create("./shader/texture.vs", "./shader/texture.fs");
+    if (!m_textureProgram)
+      return false;
+    SPDLOG_INFO("program id: {}", m_textureProgram->Get());
+
     // ======== Uniform ========
     // auto loc = glGetUniformLocation(m_program->Get(), "color");  // Get Uniform handle
     // m_program->Use();
@@ -110,26 +116,6 @@ bool Context::Init()
 
 
     // ======== Texture ========
-    auto image = Image::Load("./images/container.jpg");
-
-    if (!image)
-        return false;
-
-    SPDLOG_INFO("image: {}x{}, {} channels", 
-                    image->GetWidth(), image->GetHeight(), image->GetChannelCount());
-
-    m_texture = Texture::CreateFromImage(image.get());
-
-    auto image2 = Image::Load("./images/awesomeface.png");
-
-    if (!image2)
-        return false;
-
-    SPDLOG_INFO("image: {}x{}, {} channels", 
-                    image2->GetWidth(), image2->GetHeight(), image2->GetChannelCount());
-
-    m_texture2 = Texture::CreateFromImage(image2.get());
-    
     TexturePtr darkGrayTexture = Texture::CreateFromImage(
         Image::CreateSingleColorImage(4, 4, glm::vec4(0.2f, 0.2f, 0.2f, 1.0f)).get());
 
@@ -150,6 +136,8 @@ bool Context::Init()
     m_box2Material->diffuse = Texture::CreateFromImage(Image::Load("./images/container2.png").get());
     m_box2Material->specular = Texture::CreateFromImage(Image::Load("./images/container2_specular.png").get());
     m_box2Material->shininess = 64.0f;
+
+    m_windowTexture = Texture::CreateFromImage(Image::Load("./images/blending_transparent_window.png").get());
 
     return true;
 }
@@ -264,10 +252,10 @@ void Context::Render()
     m_box1Material->SetToProgram(m_program.get());
     m_box->Draw(m_program.get());
 
-    glEnable(GL_STENCIL_TEST);  // Stencile TEST 켜기
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);  // 
-    glStencilMask(0xFF);  // Stencile Buffer에 작성 하겠다.
+    // glEnable(GL_STENCIL_TEST);  // Stencile TEST 켜기, buffer들은 모두 0으로 초기화
+    // glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    // glStencilFunc(GL_ALWAYS, 1, 0xFF);  //
+    // glStencilMask(0xFF);  // Stencile Buffer에 작성 하겠다.
     modelTransform =
         glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.75f, 2.0f)) *
         glm::rotate(glm::mat4(1.0f), glm::radians(20.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
@@ -278,16 +266,46 @@ void Context::Render()
     m_box2Material->SetToProgram(m_program.get());
     m_box->Draw(m_program.get());
 
-    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);  // Stencile buffer가 0인 곳만 그리기, 그려진 부분은 1로 바꾸기 (1인곳은 무시)
-    glStencilMask(0x00);  // Buffer Update 단계에서 효력이 없어짐 -> Stencile Buffer에 작성을 하지 않겠다.
-    glDisable(GL_DEPTH_TEST);
-    m_simpleProgram->Use();
-    m_simpleProgram->SetUniform("color", glm::vec4(1.0f, 1.0f, 0.5f, 1.0f));
-    m_simpleProgram->SetUniform("transform", transform * glm::scale(glm::mat4(1.0f), glm::vec3(1.05f, 1.05f, 1.05f)));
-    m_box->Draw(m_simpleProgram.get());
+    // glStencilFunc(GL_NOTEQUAL, 1, 0xFF);  
+    // glStencilMask(0x00);  // Stencile Buffer에 작성을 하지 않겠다.
+    // glDisable(GL_DEPTH_TEST);
+    // m_simpleProgram->Use();
+    // m_simpleProgram->SetUniform("color", glm::vec4(1.0f, 1.0f, 0.5f, 1.0f));
+    // m_simpleProgram->SetUniform("transform", transform * glm::scale(glm::mat4(1.0f), glm::vec3(1.05f, 1.05f, 1.05f)));
+    // m_box->Draw(m_simpleProgram.get());
 
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_STENCIL_TEST);
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);
-    glStencilMask(0xFF);
+    // glEnable(GL_DEPTH_TEST);
+    // glDisable(GL_STENCIL_TEST);
+    // glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    // glStencilMask(0xFF);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    m_textureProgram->Use();
+    
+    glActiveTexture(GL_TEXTURE0);
+    m_windowTexture->Bind();
+    m_textureProgram->SetUniform("tex", 0);
+
+    modelTransform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, 4.0f));
+    transform = projection * view * modelTransform;
+    m_textureProgram->SetUniform("transform", transform);
+    m_plane->Draw(m_textureProgram.get());  // 먼저 그려짐 -> Depth 3
+
+    modelTransform =
+        glm::translate(glm::mat4(1.0f), glm::vec3(0.2f, 0.5f, 5.0f));
+    transform = projection * view * modelTransform;
+    m_textureProgram->SetUniform("transform", transform);
+    m_plane->Draw(m_textureProgram.get());
+
+    modelTransform =
+        glm::translate(glm::mat4(1.0f), glm::vec3(0.4f, 0.5f, 6.0f));
+    transform = projection * view * modelTransform;
+    m_textureProgram->SetUniform("transform", transform);
+    m_plane->Draw(m_textureProgram.get());  // 제일 마지막에 그려짐 -> Depth 1
 }
+
+// Depth가 작은 것이 큰 것을 가릴 수 있다.
+// Depth가 큰 것은 뒤에 있다. (이후에 그려질 것에 의해 가려짐)
+// 

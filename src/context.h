@@ -26,14 +26,16 @@ private:
     bool Init();
     ProgramUPtr m_program;
     ProgramUPtr m_simpleProgram;
+    ProgramUPtr m_textureProgram;
 
     MeshUPtr m_box;
+    MeshUPtr m_plane;
+
     MaterialPtr m_planeMaterial;
     MaterialPtr m_box1Material;
     MaterialPtr m_box2Material;
     // ModelUPtr m_model; // Backpack
-    TextureUPtr m_texture;
-    TextureUPtr m_texture2;
+    TexturePtr m_windowTexture;
 
     // animation
     bool m_animation { true };
