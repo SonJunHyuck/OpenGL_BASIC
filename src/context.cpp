@@ -39,6 +39,7 @@ void Context::Reshape(int width, int height)
     m_width = width;
     m_height = height;
     glViewport(0, 0, m_width, m_height);
+    m_framebuffer = Framebuffer::Create( Texture::Create(width, height, GL_RGBA) );
 }
 
 void Context::MouseMove(double x, double y)
@@ -106,6 +107,11 @@ bool Context::Init()
       return false;
     SPDLOG_INFO("program id: {}", m_textureProgram->Get());
 
+    m_postProgram = Program::Create("./shader/texture.vs", "./shader/gamma.fs");
+    if (!m_postProgram)
+        return false;
+    SPDLOG_INFO("program id: {}", m_postProgram->Get());
+
     // ======== Uniform ========
     // auto loc = glGetUniformLocation(m_program->Get(), "color");  // Get Uniform handle
     // m_program->Use();
@@ -144,7 +150,7 @@ bool Context::Init()
 
 void Context::Render()
 {
-    // begin, end pair -> UI Window
+    // begin, end pair -> UI Window #imgui
     if (ImGui::Begin("my first ImGui window"))
     {
         if(ImGui::ColorEdit4("Clear Color", glm::value_ptr(m_clearColor)))
@@ -152,6 +158,8 @@ void Context::Render()
             glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
         }
         ImGui::Separator();
+        
+        ImGui::DragFloat("gamma", &m_gamma, 0.01f, 0.0f, 2.0f);
 
         ImGui::DragFloat3("Camera Pos", glm::value_ptr(m_cameraPos), 0.01f);
         ImGui::DragFloat("Camera Yaw", &m_cameraYaw, 0.5f);
@@ -185,6 +193,8 @@ void Context::Render()
         ImGui::Text("This is first text...");
     }
     ImGui::End();
+
+    m_framebuffer->Bind();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -304,8 +314,15 @@ void Context::Render()
     transform = projection * view * modelTransform;
     m_textureProgram->SetUniform("transform", transform);
     m_plane->Draw(m_textureProgram.get());  // 제일 마지막에 그려짐 -> Depth 1
-}
 
-// Depth가 작은 것이 큰 것을 가릴 수 있다.
-// Depth가 큰 것은 뒤에 있다. (이후에 그려질 것에 의해 가려짐)
-// 
+    Framebuffer::BindToDefault();
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    m_postProgram->Use();
+    m_postProgram->SetUniform("transform", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 1.0f)));  // -1 ~ 1 (2) 까지의 범위를 모두 커버하기 위해
+    m_framebuffer->GetColorAttachment()->Bind();
+    m_postProgram->SetUniform("tex", 0);
+    m_postProgram->SetUniform("gamma", m_gamma);
+    m_plane->Draw(m_postProgram.get());
+}
