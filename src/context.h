@@ -30,6 +30,7 @@ private:
     ProgramUPtr m_textureProgram;
     ProgramUPtr m_postProgram;
     ProgramUPtr m_skyboxProgram;
+    ProgramUPtr m_envMapProgram;
 
     float m_gamma {1.0f};
 

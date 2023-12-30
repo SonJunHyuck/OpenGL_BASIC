@@ -158,6 +158,8 @@ bool Context::Init()
         cubeFront.get(), cubeBack.get(),
     });
     m_skyboxProgram = Program::Create("./shader/skybox.vs", "./shader/skybox.fs");
+    m_envMapProgram = Program::Create("./shader/env_map.vs", "./shader/env_map.fs");
+
 
     return true;
 }
@@ -337,6 +339,20 @@ void Context::Render()
     transform = projection * view * modelTransform;
     m_textureProgram->SetUniform("transform", transform);
     m_plane->Draw(m_textureProgram.get());  // 제일 마지막에 그려짐 -> Depth 1
+
+    // cube with env_map
+    modelTransform =
+        glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.75f, -2.0f)) *
+        glm::rotate(glm::mat4(1.0f), glm::radians(40.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
+        glm::scale(glm::mat4(1.0f), glm::vec3(1.5f, 1.5f, 1.5f));
+    m_envMapProgram->Use();
+    m_envMapProgram->SetUniform("model", modelTransform);
+    m_envMapProgram->SetUniform("view", view);
+    m_envMapProgram->SetUniform("projection", projection);
+    m_envMapProgram->SetUniform("cameraPos", m_cameraPos);
+    m_cubeTexture->Bind();
+    m_envMapProgram->SetUniform("skybox", 0);
+    m_box->Draw(m_envMapProgram.get());
 
     Framebuffer::BindToDefault();
 
