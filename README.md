@@ -11,3 +11,5 @@
 ### Install Build Tool (for Window)
 - https://visualstudio.microsoft.com/ko/visual-cpp-build-tools/
 
+### Results
+<p align="center"> <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/Lighting.png" width="600" height="336"> </p>
