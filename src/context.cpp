@@ -145,6 +145,22 @@ bool Context::Init()
 
     m_windowTexture = Texture::CreateFromImage(Image::Load("./images/blending_transparent_window.png").get());
 
+    auto cubeRight = Image::Load("./images/skybox/right.jpg", false);
+    auto cubeLeft = Image::Load("./images/skybox/left.jpg", false);
+    auto cubeTop = Image::Load("./images/skybox/top.jpg", false);
+    auto cubeBottom = Image::Load("./images/skybox/bottom.jpg", false);
+    auto cubeFront = Image::Load("./images/skybox/front.jpg", false);
+    auto cubeBack = Image::Load("./images/skybox/back.jpg", false);
+
+    m_cubeTexture = CubeTexture::CreateFromImages({
+        cubeRight.get(), cubeLeft.get(),
+        cubeTop.get(), cubeBottom.get(),
+        cubeFront.get(), cubeBack.get(),
+    });
+    m_skyboxProgram = Program::Create("./shader/skybox.vs", "./shader/skybox.fs");
+    m_envMapProgram = Program::Create("./shader/env_map.vs", "./shader/env_map.fs");
+
+
     return true;
 }
 
@@ -204,7 +220,7 @@ void Context::Render()
         glm::rotate(glm::mat4(1.0f), glm::radians(m_cameraPitch), glm::vec3(1.0f, 0.0f, 0.0f)) *
         glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);  // w : 1.0f -> 점, 0.0f -> 벡터 (위치 상관x -> 평행이동x)
     
-    auto projection = glm::perspective(glm::radians(45.0f), (float)m_width / (float)m_height, 0.1f, 300.0f);
+    auto projection = glm::perspective(glm::radians(45.0f), (float)m_width / (float)m_height, 0.01f, 100.0f);
     
     float angle = glfwGetTime() * glm::pi<float>() * 0.5f;
     auto x = sinf(angle) * 10.0f;
@@ -212,6 +228,15 @@ void Context::Render()
 
     auto view = glm::lookAt(m_cameraPos, m_cameraPos + m_cameraFront, m_cameraUp);
 
+    // cubemap
+    auto skyboxModelTransform = glm::translate(glm::mat4(1.0), m_cameraPos) * glm::scale(glm::mat4(1.0), glm::vec3(50.0f));
+    m_skyboxProgram->Use();
+    m_cubeTexture->Bind();
+    m_skyboxProgram->SetUniform("skybox", 0);
+    m_skyboxProgram->SetUniform("transform", projection * view * skyboxModelTransform);
+    m_box->Draw(m_skyboxProgram.get());
+
+    // light cube
     glm::vec3 lightPos = m_light.position;
     glm::vec3 lightDir = m_light.direction;
     if (m_flashLightMode)
@@ -314,6 +339,20 @@ void Context::Render()
     transform = projection * view * modelTransform;
     m_textureProgram->SetUniform("transform", transform);
     m_plane->Draw(m_textureProgram.get());  // 제일 마지막에 그려짐 -> Depth 1
+
+    // cube with env_map
+    modelTransform =
+        glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.75f, -2.0f)) *
+        glm::rotate(glm::mat4(1.0f), glm::radians(40.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
+        glm::scale(glm::mat4(1.0f), glm::vec3(1.5f, 1.5f, 1.5f));
+    m_envMapProgram->Use();
+    m_envMapProgram->SetUniform("model", modelTransform);
+    m_envMapProgram->SetUniform("view", view);
+    m_envMapProgram->SetUniform("projection", projection);
+    m_envMapProgram->SetUniform("cameraPos", m_cameraPos);
+    m_cubeTexture->Bind();
+    m_envMapProgram->SetUniform("skybox", 0);
+    m_box->Draw(m_envMapProgram.get());
 
     Framebuffer::BindToDefault();
 

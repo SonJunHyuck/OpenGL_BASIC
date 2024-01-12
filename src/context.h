@@ -29,6 +29,9 @@ private:
     ProgramUPtr m_simpleProgram;
     ProgramUPtr m_textureProgram;
     ProgramUPtr m_postProgram;
+    ProgramUPtr m_skyboxProgram;
+    ProgramUPtr m_envMapProgram;
+
     float m_gamma {1.0f};
 
     MeshUPtr m_box;
@@ -39,6 +42,7 @@ private:
     MaterialPtr m_box2Material;
     // ModelUPtr m_model; // Backpack
     TexturePtr m_windowTexture;
+    CubeTextureUPtr m_cubeTexture;
 
     // animation
     bool m_animation { true };
