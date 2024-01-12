@@ -54,12 +54,7 @@ ExternalProject_Add(
 
 # Dependency 리스트에 dep_glfw추가
 set(DEP_LIST ${DEP_LIST} dep_glfw)
-
-if(APPLE OR MINGW)
-    set(DEP_LIBS ${DEP_LIBS} glfw3)
-else()
-    set(DEP_LIBS ${DEP_LIBS} glfw3$<$<CONFIG:Debug>:d>)
-endif()
+set(DEP_LIBS ${DEP_LIBS} glfw3)
 
 # glad
 ExternalProject_Add(
@@ -75,12 +70,7 @@ ExternalProject_Add(
 
 # Dependency 리스트에 dep_glfw추가
 set(DEP_LIST ${DEP_LIST} dep_glad)
-
-if(APPLE OR MINGW)
-    set(DEP_LIBS ${DEP_LIBS} glad)
-else()
-    set(DEP_LIBS ${DEP_LIBS} glad$<$<CONFIG:Debug>:d>)
-endif()
+set(DEP_LIBS ${DEP_LIBS} glad)
 
 
 # stb
@@ -135,3 +125,36 @@ add_dependencies(imgui ${DEP_LIST})
 set(DEP_INCLUDE_DIR ${DEP_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
 set(DEP_LIST ${DEP_LIST} imgui)
 set(DEP_LIBS ${DEP_LIBS} imgui)
+
+# assimp
+ExternalProject_Add(
+  dep_assimp
+  GIT_REPOSITORY "https://github.com/assimp/assimp"
+  GIT_TAG "v5.0.1"
+  GIT_SHALLOW 1
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  CMAKE_ARGS
+      -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
+      -DBUILD_SHARED_LIBS=OFF
+      -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
+      -DASSIMP_BUILD_TESTS=OFF
+      -DASSIMP_INJECT_DEBUG_POSTFIX=OFF
+      -DASSIMP_BUILD_ZLIB=ON
+  TEST_COMMAND ""
+  )
+set(DEP_LIST ${DEP_LIST} dep_assimp)
+
+if(APPLE)
+set(DEP_LIBS ${DEP_LIBS}
+  assimp
+  zlibstatic
+  IrrXML
+)
+else()
+set(DEP_LIBS ${DEP_LIBS}
+  assimp-vc143-mt$<$<CONFIG:Debug>:d>
+  zlibstatic$<$<CONFIG:Debug>:d>
+  IrrXML$<$<CONFIG:Debug>:d>
+)
+endif()
