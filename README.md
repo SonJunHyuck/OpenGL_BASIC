@@ -13,3 +13,13 @@
 
 ### Results
 <p align="center"> <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/Lighting.png" width="600" height="336"> </p>
+<figcaption>Result : Lighting</figcaption>
+
+<p align="center"> <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/ObjectLoader.png" width="600" height="336"> </p>
+<figcaption>Result : Object Loader (Bag with Light Box)</figcaption>
+
+<p align="center"> <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/Advanced1.png" width="600" height="336"> </p>
+<figcaption>Result : Stencil Buffer, Alpha Blending</figcaption>
+
+<p align="center"> <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/Cubemap.png" width="600" height="336"> </p>
+<figcaption>Result : Cubemap</figcaption>
