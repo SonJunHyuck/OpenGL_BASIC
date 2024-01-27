@@ -13,7 +13,7 @@
 
 ### Results
 <p align="center"> <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/Lighting.png" width="600" height="336"> </p>
-<figcaption>Result : Lighting</figcaption>
+<figcaption="center">Result : Lighting</figcaption>
 
 <p align="center"> <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/ObjectLoader.png" width="600" height="336"> </p>
 <figcaption>Result : Object Loader (Bag with Light Box)</figcaption>
