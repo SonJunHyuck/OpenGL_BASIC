@@ -13,21 +13,21 @@
 
 ### Results
 <figure>
-    <figcaption>Lighting</figcaption>
+    <figcaption>Lighting</figcaption> ⬇️⬇️⬇️
     <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/Lighting.png" width="600" height="336" align="center">
 </figure>
 
 <figure>
-    <figcaption>Object Loader (Bag with Light Box)</figcaption>
+    <figcaption>Object Loader (Bag with Light Box)</figcaption> ⬇️⬇️⬇️
     <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/ObjectLoader.png" width="600" height="336" align="center">
 </figure>
 
 <figure>
-    <figcaption>Stencil Buffer, Alpha Blending</figcaption>
+    <figcaption>Stencil Buffer, Alpha Blending</figcaption> ⬇️⬇️⬇️
     <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/Advanced1.png" width="600" height="336" align="center">
 </figure>
 
 <figure>
-    <figcaption>Cubemap</figcaption>
+    <figcaption>Cubemap</figcaption> ⬇️⬇️⬇️
     <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/Cubemap.png" width="600" height="336" align="center">
 </figure>
