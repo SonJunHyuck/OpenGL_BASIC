@@ -12,14 +12,22 @@
 - https://visualstudio.microsoft.com/ko/visual-cpp-build-tools/
 
 ### Results
-<p align="center"> <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/Lighting.png" width="600" height="336"> </p>
-<figcaption="center">Result : Lighting</figcaption>
+<figure>
+    <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/Lighting.png" width="600" height="336" align="center">
+    <figcaption>Lighting</figcaption>
+</figure>
 
-<p align="center"> <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/ObjectLoader.png" width="600" height="336"> </p>
-<figcaption>Result : Object Loader (Bag with Light Box)</figcaption>
+<figure>
+    <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/ObjectLoader.png" width="600" height="336" align="center">
+<figcaption>Object Loader (Bag with Light Box)</figcaption>
+</figure>
 
-<p align="center"> <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/Advanced1.png" width="600" height="336"> </p>
-<figcaption>Result : Stencil Buffer, Alpha Blending</figcaption>
+<figure>
+    <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/Advanced1.png" width="600" height="336" align="center">
+<figcaption>Stencil Buffer, Alpha Blending</figcaption>
+</figure>
 
-<p align="center"> <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/Cubemap.png" width="600" height="336"> </p>
-<figcaption>Result : Cubemap</figcaption>
+<figure>
+    <img src="https://github.com/SonJunHyuck/OpenGL_BASIC/blob/main/displays/Cubemap.png" width="600" height="336" align="center">
+<figcaption>Cubemap</figcaption>
+</figure>
